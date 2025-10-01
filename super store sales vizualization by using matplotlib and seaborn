@@ -1,0 +1,82 @@
+#%%
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import warnings
+warnings.filterwarnings('ignore')
+#%%
+data = pd.read_csv("D:/SampleSuperstore.csv.zip")
+data
+data.info()
+#%%
+data = pd.DataFrame(data)
+print(data)
+print(list(data.columns))
+#%%
+data.head(10)
+
+#%%
+data.duplicated().sum()
+data.isnull().sum()
+#%%
+data.shape
+
+#%%
+data.describe()
+#%% md
+# ## Hiegest count pf Sub_Category Distribution
+#%%
+data['Sub-Category'].value_counts()
+sns.countplot(data['Sub-Category'],palette='rainbow',edgecolor='red')
+plt.title('Sub-Category Distribution')
+plt.figure(figsize=(12,12))
+plt.show()
+
+
+#%% md
+# Distribution of Profit by Ship Mode
+#%%
+# data['Ship Mode'].value_counts()
+dp = data.groupby('Ship Mode')['Profit'].sum().round(2)
+dp
+plt.title('Ship Mode Distribution of Profit')
+plt.pie(dp.values,autopct='%1.0f%%',labels=dp.index,startangle=90)
+plt.figure(figsize=(12,12))
+plt.show()
+#%% md
+# # **Region by sales portfolio**
+#%%
+gpp = data.groupby('Region').agg({"Sales":"sum"}).sort_values('Sales',ascending=False)
+sns.heatmap(data=gpp,cmap='YlGnBu',annot=True,fmt = '.0f')
+plt.title("Regional by Sales Portfolio")
+#%% md
+# ###  **Region by Profit Show**
+#%%
+gp = data.groupby("Region").agg({"Profit":"sum"}).round(2).sort_values('Profit',ascending=False)
+gp
+sns.barplot(x="Region", y="Profit", data=gp, color="black")
+plt.title('Regional Profit Distribution')
+#%% md
+# ### **Category by sum of profit**
+#%%
+-dd= data.groupby("Category").agg({"Profit":"sum"}).round(2).sort_values('Profit',ascending=False)
+sns.lineplot(data=dd, x="Category", y="Profit", color="blue")
+plt.title('Categorical Profit Distribution')
+
+#%% md
+# ### **Segment by Discount**
+#%%
+plt.bar(data["Segment"], data["Discount"],facecolor='gray',edgecolor='black',hatch='//',alpha=0.3)
+plt.show()
+#%% md
+# ### **Sub-Category wise to Category Sales = Quantity**
+#%%
+# Group by Category & Sub-Category
+ddd = data.groupby(["Sub-Category","Category"]).agg({"Quantity" :"sum"})
+sns.relplot(data = ddd,y = "Sub-Category", x ="Quantity", hue="Category",kind = "line")
+plt.show()
+#%% md
+# ### **relationship of Integers values to Segment**
+#%%
+sns.pairplot(data=data, hue="Segment")
